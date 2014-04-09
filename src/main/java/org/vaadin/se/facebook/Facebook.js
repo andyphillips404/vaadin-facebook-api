@@ -1,9 +1,15 @@
 window.org_vaadin_se_facebook_Facebook = function() {
 
-    this.apiInit = false;
-
     var self = this;
-    //self.getElement().innerHTML = "<div id=\"fb-root\"></div><div class=\"fb-login-button\" data-max-rows=\"1\" data-size=\"xlarge\" data-show-faces=\"false\" data-auto-logout-link=\"false\"></div>";
+
+    this.fbRoot = document.getElementById("fb-root");
+    if (!this.fbRoot) {
+        this.fbRoot = document.createElement("div");
+        this.fbRoot.id = "fb-root";
+        document.body.appendChild(this.fbRoot);
+    }
+
+    this.apiInit = false;
 
     this.onStateChange = function() {
         if (!self.apiInit) {
@@ -23,17 +29,18 @@ window.org_vaadin_se_facebook_Facebook = function() {
 
             /* Subscribe to all facebook login events */
             FB.Event.subscribe('auth.login', function(response) {
-                if (response.authResponse) {
-                    var r = response.authResponse;
-                    self.onLogin(r.userID, r.accessToken, response.status);
-                } else {
-                    // Login was asked, but cancelled
-                }
 
             });
 
             FB.Event.subscribe('auth.logout', function(response) {
-                self.onLogout();
+            });
+
+            FB.Event.subscribe('auth.statusChange', function(response) {
+                if (response.status == "connected") {
+                    var r = response.authResponse;
+                    self.onLogin(r.userID, r.accessToken);
+                } else
+                    self.onLogout();
             });
 
         };

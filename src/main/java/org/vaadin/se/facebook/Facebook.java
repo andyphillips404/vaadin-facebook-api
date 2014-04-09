@@ -21,7 +21,6 @@ import com.vaadin.ui.JavaScriptFunction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +40,7 @@ public class Facebook extends AbstractJavaScriptExtension {
     private String authToken;
 
     private String userId;
-    private String status = STATUS_UNKNOWN;
+    private boolean loggedIn;
     private FacebookCallback activeCallback;
 
     public void addListener(FacebookListener listener) {
@@ -62,7 +61,7 @@ public class Facebook extends AbstractJavaScriptExtension {
                 for (FacebookListener listener : Collections.unmodifiableList(listeners)) {
                     Facebook.this.userId = arguments.getString(0);
                     Facebook.this.authToken = arguments.getString(1);
-                    Facebook.this.status = arguments.getString(2);
+                    Facebook.this.loggedIn = true;
                     listener.onFacebookLogin(userId);
                 }
             }
@@ -72,6 +71,7 @@ public class Facebook extends AbstractJavaScriptExtension {
 
             @Override
             public void call(JSONArray arguments) throws JSONException {
+                Facebook.this.loggedIn = false;
                 for (FacebookListener listener : Collections.unmodifiableList(listeners)) {
                     listener.onFacebookLogout();
                 }
@@ -106,7 +106,7 @@ public class Facebook extends AbstractJavaScriptExtension {
                 FacebookCallback cb = activeCallback;
                 activeCallback = null;
                 if (cb != null) {
-                    cb.facebookResponse(arguments != null && arguments.length() > 0? arguments.getJSONObject(0): null);
+                    cb.facebookResponse(arguments != null && arguments.length() > 0 ? arguments.getJSONObject(0) : null);
                 }
             }
         });
@@ -127,7 +127,7 @@ public class Facebook extends AbstractJavaScriptExtension {
     }
 
     public boolean isLoggedIn() {
-        return userId != null && status == STATUS_CONNECTED;
+        return loggedIn && userId != null;
     }
 
     public String getAuthToken() {
@@ -136,10 +136,6 @@ public class Facebook extends AbstractJavaScriptExtension {
 
     public String getUserId() {
         return userId;
-    }
-
-    public String getStatus() {
-        return status;
     }
 
     public void share(String link, String caption) {
