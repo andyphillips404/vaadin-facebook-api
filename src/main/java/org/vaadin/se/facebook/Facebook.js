@@ -23,8 +23,8 @@ window.org_vaadin_se_facebook_Facebook = function() {
         window.fbAsyncInit = function() {
             FB.init({
                 appId: fbAppId,
-                status: true,
-                xfbml: true
+                cookie: true,
+                status: true
             });
 
             /* Subscribe to all facebook login events */

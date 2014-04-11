@@ -152,7 +152,7 @@ public class Facebook extends AbstractJavaScriptExtension {
         ui(p);
     }
 
-    protected void ui(Post params) {
+    public void ui(Post params) {
         callFunction("ui", new JSONObject(params));
     }
 
